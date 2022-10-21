@@ -65,3 +65,34 @@ print(config.store.data_dir)  # => data/FANS/zhihu
 print(config.store.save_dir)  # => saving/zhihu/bert-E64/
 print(exp.exp)  # => step-5
 ```
+
+```yaml
+# ./data/any.yaml
+
+store:
+  data_dir: data/FANS/${dataset}
+  save_dir: saving/${dataset}/${exp.model}-E${config.model_config.hidden_size}/
+model_config:
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 8
+```
+
+```python
+from refconfig import RefConfig
+
+config = RefConfig().add_yaml(
+    exp='./exp/train.yaml',
+    config='./data/any.yaml',
+).add_raw(
+    dataset='youtube',
+).parse()
+
+from oba import Obj
+
+config = Obj(config)
+config, exp = config.config, config.exp
+print(config.store.data_dir)  # => data/FANS/youtube
+print(config.store.save_dir)  # => saving/youtube/bert-E64/
+print(exp.exp)  # => step-5
+```

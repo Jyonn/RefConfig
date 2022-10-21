@@ -2,8 +2,6 @@ import smartdict
 import yaml
 import json
 
-from oba import Obj
-
 from refconfig import config_type
 from refconfig.config_type import CType
 
@@ -24,16 +22,22 @@ class AtomConfig:
             return t
 
         if isinstance(self.config, dict):
-            return CType.DICT
+            return CType.RAW
+        if isinstance(self.config, list):
+            return CType.RAW
+        if isinstance(self.config, tuple):
+            return CType.RAW
+
         assert isinstance(self.config, str), self.error
         if self.config.endswith('.yaml'):
             return CType.YAML
         if self.config.endswith('.json'):
             return CType.JSON
-        raise self.error
+        return CType.RAW
+        # return CType.STRING
 
     def parse_config(self):
-        if self.t is CType.DICT:
+        if self.t is CType.RAW:
             return self.config
         if self.t is CType.JSON:
             return json.load(open(self.config, 'rb+'))
@@ -45,7 +49,7 @@ class AtomConfig:
         return f'Config({self.key}-{self.t})'
 
 
-def parse(__obj: bool = False, *configs: AtomConfig):
+def parse(*configs: AtomConfig):
     kv = dict()
 
     for config in configs:
@@ -61,10 +65,37 @@ def parse_by_tuple(*configs: tuple):
     return parse(*[AtomConfig(config=config[0], key=config[1], t=config[2]) for config in configs])
 
 
+class RefConfig:
+    def __init__(self):
+        self.configs = []
+
+    def add(self, t, __config=None, **configs):
+        if __config:
+            configs = [(__config, None, t)]
+        else:
+            configs = [(v, k, t) for k, v in configs.items()]
+        configs = [AtomConfig(config=config[0], key=config[1], t=config[2]) for config in configs]
+        self.configs.extend(configs)
+        return self
+
+    def add_yaml(self, __config: str = None, **configs):
+        return self.add(CType.YAML, __config, **configs)
+
+    def add_json(self, __config: str = None, **configs):
+        return self.add(CType.JSON, __config, **configs)
+
+    def add_raw(self, __config: str = None, **configs):
+        return self.add(CType.RAW, __config, **configs)
+
+    def parse(self):
+        return parse(*self.configs)
+
+
 def parse_with_single_type(t, __config=None, **configs):
-    if __config:
-        return parse_by_tuple((__config, None, t))
-    return parse_by_tuple(*[(v, k, t) for k, v in configs.items()])
+    # if __config:
+    #     return parse_by_tuple((__config, None, t))
+    # return parse_by_tuple(*[(v, k, t) for k, v in configs.items()])
+    return RefConfig().add(t, __config, **configs).parse()
 
 
 def parse_yaml(__config: str = None, **configs):
@@ -75,5 +106,5 @@ def parse_json(__config: str = None, **configs):
     return parse_with_single_type(CType.JSON, __config, **configs)
 
 
-def parse_dict(__config: dict = None, **configs):
-    return parse_with_single_type(CType.DICT, __config, **configs)
+def parse_raw(__config: dict = None, **configs):
+    return parse_with_single_type(CType.RAW, __config, **configs)

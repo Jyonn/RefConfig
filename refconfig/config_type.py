@@ -5,7 +5,7 @@ from typing import Union
 class CType(Enum):
     YAML = 1
     JSON = 2
-    DICT = 0
+    RAW = 3
     SMART = -1
 
 
