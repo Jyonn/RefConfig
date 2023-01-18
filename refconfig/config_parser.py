@@ -12,7 +12,6 @@ class AtomConfig:
         self.key = key
         self.t = self.parse_type(t)
 
-        self.error = ValueError('Can not identify ConfigType')
         self.value = self.parse_config()
 
     def parse_type(self, t):
@@ -21,14 +20,9 @@ class AtomConfig:
         if t is not CType.SMART:
             return t
 
-        if isinstance(self.config, dict):
-            return CType.RAW
-        if isinstance(self.config, list):
-            return CType.RAW
-        if isinstance(self.config, tuple):
+        if not isinstance(self.config, str):
             return CType.RAW
 
-        assert isinstance(self.config, str), self.error
         if self.config.endswith('.yaml'):
             return CType.YAML
         if self.config.endswith('.json'):
@@ -43,7 +37,7 @@ class AtomConfig:
             return json.load(open(self.config, 'rb+'))
         if self.t is CType.YAML:
             return yaml.safe_load(open(self.config, 'rb+'))
-        raise self.error
+        raise ValueError('Can not identify ConfigType')
 
     def __str__(self):
         return f'Config({self.key}-{self.t})'

@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='refconfig',
-    version='0.0.2',
+    version='0.0.3',
     keywords=['configuration', 'refer'],
     description='a flexible and variable-based tool for multi-type configuration, including json, yaml, and python dict',
     long_description=long_description,
