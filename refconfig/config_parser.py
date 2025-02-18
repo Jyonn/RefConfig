@@ -1,8 +1,6 @@
 import smartdict
-import yaml
-import json
 
-from refconfig import config_type
+from refconfig import config_type, jyonnie_config
 from refconfig.config_type import CType
 
 
@@ -33,10 +31,12 @@ class AtomConfig:
     def parse_config(self):
         if self.t is CType.RAW:
             return self.config
-        if self.t is CType.JSON:
-            return json.load(open(self.config, 'rb+'))
-        if self.t is CType.YAML:
-            return yaml.safe_load(open(self.config, 'rb+'))
+        # if self.t is CType.JSON:
+        #     return json.load(open(self.config, 'rb+'))
+        # if self.t is CType.YAML:
+        #     return yaml.safe_load(open(self.config, 'rb+'))
+        if self.t in [CType.JSON, CType.YAML]:
+            return jyonnie_config.parse(self.config)
         raise ValueError('Can not identify ConfigType')
 
     def __str__(self):

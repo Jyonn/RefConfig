@@ -22,6 +22,7 @@ error = ValueError(f'Config type is restricted in {CType_str}')
 
 
 def parse_type(t: Union[str, int, CType]):
+    """Analyse the type of the config file"""
     if isinstance(t, str):
         assert t.upper() in CType_str, error
         return CType.__getitem__(t.upper())
