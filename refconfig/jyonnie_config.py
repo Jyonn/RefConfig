@@ -16,11 +16,10 @@ def read(filepath: str):
     elif filepath.endswith('.json'):
         handler = json.load
 
-    with open(filepath, 'rb+') as f:
+    with open(filepath, 'r+') as f:
         config = handler(f)
 
     workdir = os.path.dirname(filepath)
-    config[Symbol.WORKDIR] = workdir
     if Symbol.IMPORT in config:
         if not isinstance(config[Symbol.IMPORT], list):
             config[Symbol.IMPORT] = [config[Symbol.IMPORT]]
